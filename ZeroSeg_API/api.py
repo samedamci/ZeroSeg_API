@@ -17,7 +17,7 @@ def root() -> dict:
     # Verify if `position` is valid using `validate_position` function.
     if "char" in args or "byte" in args:
         if "position" in args:
-            position = args["position"]
+            position = int(args["position"])
             val = validate_position(position)
             if not val:
                 return {"status": 406}  # Not Acceptable
