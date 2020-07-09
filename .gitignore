@@ -3,3 +3,5 @@ lib/
 pyvenv.cfg
 site-packages/
 __pycache__/
+ZeroSeg_API.egg-info/
+dist
