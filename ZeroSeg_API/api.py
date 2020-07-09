@@ -9,11 +9,6 @@ from flask import request
 def root() -> dict:
     args = request.args
 
-    if "text" in args:
-        send_text(str(args["text"]))
-    if "number" in args:
-        send_number(float(args["number"]))
-
     # Verify if `position` is valid using `validate_position` function.
     if "char" in args or "byte" in args:
         if "position" in args:
@@ -24,15 +19,25 @@ def root() -> dict:
         else:
             position = 1
 
-    if "char" in args:
+    if "text" in args:
+        send_text(str(args["text"]))
+
+        return {"status": 200}  # OK
+
+    elif "number" in args:
+        send_number(float(args["number"]))
+
+        return {"status": 200}
+
+    elif "char" in args:
         send_char(str(args["char"]), position)
 
-        return {"status": 200}  # OK
+        return {"status": 200}
 
-    if "byte" in args:
-        send_byte(int(args["byte"]), position)
+    elif "byte" in args:
+        send_byte(int(args["byte"], 0), position)
 
-        return {"status": 200}  # OK
+        return {"status": 200}
 
     else:
         return {"status": 403}  # Forbidden
@@ -50,7 +55,7 @@ def send_text(text: str) -> dict:
     except OverflowError:
         screen.show_message(text)
 
-    return {"status": 200}  # OK
+    return {"status": 200}
 
 
 def send_number(num: float) -> dict:
@@ -92,6 +97,8 @@ def send_byte(byte: int, position: int) -> dict:
     Set any `int` byte value (range {0..255}) on any position if specified
     (default: 1). Function uses `set_byte` method.
     """
-    screen.set_byte(byte, position)
-
-    return {"status": 200}
+    if byte > 255 or byte < 0:
+        return {"status": 406}
+    else:
+        screen.set_byte(byte, position)
+        return {"status": 200}
