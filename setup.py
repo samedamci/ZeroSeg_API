@@ -14,7 +14,7 @@ def read(filename):
 
 setup(
     name="ZeroSeg-API",
-    version="0.1.2",
+    version="0.1.3",
     author="samedamci",
     author_email="samedamci@disroot.org",
     description=("REST API for ZeroSeg Improved library."),
