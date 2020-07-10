@@ -48,6 +48,35 @@ def root() -> dict:
     elif "text" in args:
         return send_text(str(args["text"]))
 
+    elif "blinking_text" in args:
+        if "delay_hide" in args:
+            try:
+                delay_hide = float(args["delay_hide"])
+            except ValueError:
+                return {"status": 406}
+        else:
+            delay_hide = 0.4
+
+        if "delay_show" in args:
+            try:
+                delay_show = float(args["delay_show"])
+            except ValueError:
+                return {"status": 406}
+        else:
+            delay_show = 0.4
+
+        if "stop_after" in args:
+            try:
+                stop_after = int(args["stop_after"])
+            except ValueError:
+                return {"status": 406}
+        else:
+            stop_after = 5
+
+        return send_blinking_text(
+            args["blinking_text"], delay_hide, delay_show, stop_after
+        )
+
     elif "number" in args:
         return send_number(float(args["number"]))
 
@@ -68,6 +97,22 @@ def send_text(text: str) -> dict:
         screen.show_message(text)
 
     return {"status": 200}
+
+
+def send_blinking_text(
+    text: str, delay_hide: float, delay_show: float, stop_after: int
+) -> dict:
+    """
+    Send text (max 8 chars) using `write_blinking_text` method.
+
+    WARNING: Unlike `send_text` function don't using `show_message` method
+    when text is longer than 8 characters and in this case returns error code.
+    """
+    try:
+        screen.write_blinking_text(text, delay_hide, delay_show, stop_after)
+        return {"status": 200}
+    except OverflowError:
+        return {"status": 406}
 
 
 def send_number(num: float) -> dict:
