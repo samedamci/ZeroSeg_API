@@ -6,6 +6,9 @@ from flask import request
 
 
 def inrange(value: int, down_limit: int, top_limit: int) -> bool:
+    """
+    Check if number is in specified range and return bool.
+    """
     if value in range(down_limit, top_limit + 1):
         return True
     else:
@@ -41,10 +44,10 @@ def root() -> dict:
             return {"status": 406}
 
     if "text" in args:
-        send_text(str(args["text"]))
+        return send_text(str(args["text"]))
 
     elif "number" in args:
-        send_number(float(args["number"]))
+        return send_number(float(args["number"]))
 
     else:
         return {"status": 403}  # Forbidden
