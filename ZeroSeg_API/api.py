@@ -29,13 +29,13 @@ def root() -> dict:
         try:
             if inrange(int(position), 1, 8):
                 if "char" in args:
-                    send_char(str(args["char"]), position)
+                    send_char(str(args["char"]), int(position))
 
                 elif "byte" in args:
                     try:
                         byte = int(args["byte"], 0)
                         if inrange(byte, 0, 255):
-                            send_byte(byte, position)
+                            send_byte(byte, int(position))
 
                     except ValueError:
                         return {"status": 406}
