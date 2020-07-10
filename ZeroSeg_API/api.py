@@ -29,21 +29,21 @@ def root() -> dict:
         try:
             if inrange(int(position), 1, 8):
                 if "char" in args:
-                    send_char(str(args["char"]), int(position))
+                    return send_char(str(args["char"]), int(position))
 
                 elif "byte" in args:
                     try:
                         byte = int(args["byte"], 0)
                         if inrange(byte, 0, 255):
-                            send_byte(byte, int(position))
+                            return send_byte(byte, int(position))
 
                     except ValueError:
-                        return {"status": 406}
+                        return {"status": 406}  # Not Allowed
 
         except ValueError:
             return {"status": 406}
 
-    if "text" in args:
+    elif "text" in args:
         return send_text(str(args["text"]))
 
     elif "number" in args:
