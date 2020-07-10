@@ -5,39 +5,46 @@ from ZeroSeg_API import app
 from flask import request
 
 
+def inrange(value: int, down_limit: int, top_limit: int) -> bool:
+    if value in range(down_limit, top_limit + 1):
+        return True
+    else:
+        return False
+
+
 @app.route("/", methods=["POST"])
 def root() -> dict:
     args = request.args
 
-    # Verify if `position` is valid using `validate_position` function.
+    # Verify if `position` is valid.
     if "char" in args or "byte" in args:
         if "position" in args:
-            position = int(args["position"])
-            val = validate_position(position)
-            if not val:
-                return {"status": 406}  # Not Acceptable
+            position = args["position"]
         else:
             position = 1
+
+        try:
+            if inrange(int(position), 1, 8):
+                if "char" in args:
+                    send_char(str(args["char"]), position)
+
+                elif "byte" in args:
+                    try:
+                        byte = int(args["byte"], 0)
+                        if inrange(byte, 0, 255):
+                            send_byte(byte, position)
+
+                    except ValueError:
+                        return {"status": 406}
+
+        except ValueError:
+            return {"status": 406}
 
     if "text" in args:
         send_text(str(args["text"]))
 
-        return {"status": 200}  # OK
-
     elif "number" in args:
         send_number(float(args["number"]))
-
-        return {"status": 200}
-
-    elif "char" in args:
-        send_char(str(args["char"]), position)
-
-        return {"status": 200}
-
-    elif "byte" in args:
-        send_byte(int(args["byte"], 0), position)
-
-        return {"status": 200}
 
     else:
         return {"status": 403}  # Forbidden
@@ -70,16 +77,6 @@ def send_number(num: float) -> dict:
         screen.show_message(str(num))
 
     return {"status": 200}
-
-
-def validate_position(position: int) -> bool:
-    """
-    Verify if `position` argument is valid and return bool.
-    """
-    if int(position) > 8 or int(position) < 1:
-        return False
-    else:
-        return True
 
 
 def send_char(char: str, position: int) -> dict:
