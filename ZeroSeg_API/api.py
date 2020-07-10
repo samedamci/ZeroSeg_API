@@ -36,9 +36,11 @@ def root() -> dict:
                         byte = int(args["byte"], 0)
                         if inrange(byte, 0, 255):
                             return send_byte(byte, int(position))
+                        else:
+                            return {"status": 406}  # Not Allowed
 
                     except ValueError:
-                        return {"status": 406}  # Not Allowed
+                        return {"status": 406}
 
         except ValueError:
             return {"status": 406}
