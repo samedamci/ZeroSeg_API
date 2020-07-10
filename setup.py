@@ -14,7 +14,7 @@ def read(filename):
 
 setup(
     name="ZeroSeg-API",
-    version="0.1.3",
+    version="0.1.4",
     author="samedamci",
     author_email="samedamci@disroot.org",
     description=("REST API for ZeroSeg Improved library."),
@@ -23,7 +23,7 @@ setup(
     url="https://github.com/samedamci/ZeroSeg_API",
     project_urls={"Issue tracker": "https://github.com/samedamci/ZeroSeg_API/issues"},
     packages=find_packages(),
-    license="MIT",
+    license="ISC",
     keywords="raspberry pi rpi led max7219 matrix seven segment zeroseg api",
     python_requires=">=3.6",
     install_requires=read('requirements.txt').splitlines(),
@@ -37,7 +37,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: ISC License (ISCL)",
         "Operating System :: POSIX :: Linux",
     ],
 )
