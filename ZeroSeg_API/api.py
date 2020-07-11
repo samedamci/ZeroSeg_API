@@ -3,6 +3,7 @@
 from ZeroSeg import screen
 from ZeroSeg_API import app
 from flask import request
+from json import dumps
 
 
 def inrange(value: int, down_limit: int, top_limit: int) -> bool:
@@ -15,9 +16,17 @@ def inrange(value: int, down_limit: int, top_limit: int) -> bool:
         return False
 
 
+class status(object):
+    success = dumps({"status": "Success!"}), 200
+    out_of_range = dumps({"status": "Out of range."}), 406
+    value_error = dumps({"status": "Value error."}), 406
+    value_error = dumps({"status": "Overflow error."}), 418
+    forbidden = dumps({"status": "Forbidden."}), 403
+
+
 @app.route("/", methods=["POST"])
-def root() -> dict:
-    args = request.args
+def root():
+    args = request.json
 
     # Verify if `position` is valid.
     if "char" in args or "byte" in args:
@@ -37,13 +46,13 @@ def root() -> dict:
                         if inrange(byte, 0, 255):
                             return send_byte(byte, int(position))
                         else:
-                            return {"status": 406}  # Not Allowed
+                            return status.out_of_range
 
                     except ValueError:
-                        return {"status": 406}
+                        return status.value_error
 
         except ValueError:
-            return {"status": 406}
+            return status.value_error
 
     elif "text" in args:
         return send_text(str(args["text"]))
@@ -53,7 +62,7 @@ def root() -> dict:
             try:
                 delay_hide = float(args["delay_hide"])
             except ValueError:
-                return {"status": 406}
+                return status.value_error
         else:
             delay_hide = 0.4
 
@@ -61,7 +70,7 @@ def root() -> dict:
             try:
                 delay_show = float(args["delay_show"])
             except ValueError:
-                return {"status": 406}
+                return status.value_error
         else:
             delay_show = 0.4
 
@@ -69,7 +78,7 @@ def root() -> dict:
             try:
                 stop_after = int(args["stop_after"])
             except ValueError:
-                return {"status": 406}
+                return status.value_error
         else:
             stop_after = 5
 
@@ -81,10 +90,10 @@ def root() -> dict:
         return send_number(float(args["number"]))
 
     else:
-        return {"status": 403}  # Forbidden
+        return status.forbidden
 
 
-def send_text(text: str) -> dict:
+def send_text(text: str):
     """
     Display text on screen. If content length is less or equal 8 then in
     use is `write_text` method, else `show_message` and displayed is scrolled
@@ -96,12 +105,12 @@ def send_text(text: str) -> dict:
     except OverflowError:
         screen.show_message(text)
 
-    return {"status": 200}
+    return status.success
 
 
 def send_blinking_text(
     text: str, delay_hide: float, delay_show: float, stop_after: int
-) -> dict:
+):
     """
     Send text (max 8 chars) using `write_blinking_text` method.
 
@@ -110,12 +119,12 @@ def send_blinking_text(
     """
     try:
         screen.write_blinking_text(text, delay_hide, delay_show, stop_after)
-        return {"status": 200}
+        return status.success
     except OverflowError:
-        return {"status": 406}
+        return status.overflow_error
 
 
-def send_number(num: float) -> dict:
+def send_number(num: float):
     """
     Display any integer (rounded float) starting from right side of screen
     via `write_number` method. Similar as `send_text` function use `show_message`
@@ -126,26 +135,26 @@ def send_number(num: float) -> dict:
     except OverflowError:
         screen.show_message(str(num))
 
-    return {"status": 200}
+    return status.success
 
 
-def send_char(char: str, position: int) -> dict:
+def send_char(char: str, position: int):
     """
     Display any `str` type character using `write_char` method on
     any position if specified .
     """
     screen.write_char(char, position)
 
-    return {"status": 200}
+    return status.success
 
 
-def send_byte(byte: int, position: int) -> dict:
+def send_byte(byte: int, position: int):
     """
     Set any `int` byte value (range {0..255}) on any position if specified
     (default: 1). Function uses `set_byte` method.
     """
     if byte > 255 or byte < 0:
-        return {"status": 406}
+        return status.out_of_range
     else:
         screen.set_byte(byte, position)
-        return {"status": 200}
+        return status.success
